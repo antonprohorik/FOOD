@@ -383,7 +383,7 @@ axios.get('http://localhost:3000/menu')
             dots.push(dot);
           }
 
-          function slideLength () {
+          function slideSwitch () {
             slidesField.style.transform = `translateX(-${offset}px)`;
 
             if(slides.length < 10) {
@@ -396,11 +396,15 @@ axios.get('http://localhost:3000/menu')
             dots[slideIndex -1].style.opacity = 1;
           }
 
+          function deleteNotDigits(str) {
+            return +str.replace(/\D/g, '');
+          }
+
         next.addEventListener('click', () => {
-          if (offset == +width.slice(0, width.length -2) * (slides.length -1)) {
+          if (offset == deleteNotDigits(width) * (slides.length -1)) {
             offset = 0;
           } else {
-            offset += +width.slice(0, width.length -2);
+            offset += deleteNotDigits(width);
           }
 
           if (slideIndex == slides.length) {
@@ -409,14 +413,14 @@ axios.get('http://localhost:3000/menu')
             slideIndex++;
           }
 
-          slideLength();
+          slideSwitch();
         });
 
         prev.addEventListener('click', () => {
           if (offset == 0) {
-            offset = +width.slice(0, width.length -2) * (slides.length -1);
+            offset = deleteNotDigits(width) * (slides.length -1);
           } else {
-            offset -= +width.slice(0, width.length -2);
+            offset -= deleteNotDigits(width);
           }
 
           if (slideIndex ==1) {
@@ -425,7 +429,7 @@ axios.get('http://localhost:3000/menu')
             slideIndex--;
           }
 
-          slideLength();
+          slideSwitch();
         });
 
         dots.forEach(dot => {
@@ -433,10 +437,80 @@ axios.get('http://localhost:3000/menu')
             const slideTo = e.target.getAttribute('data-slide-to');
 
             slideIndex = slideTo;
-            offset = +width.slice(0, width.length -2) * (slideTo-1);
+            offset = deleteNotDigits(width) * (slideTo-1);
 
-            slideLength();
+            slideSwitch();
           });
         });
 
+
+      //CALC
+
+  const result = document.querySelector('.calculating__result span');
+  let sex = 'female',
+      height, weight,age,
+      ratio = 1.375;
+
+  function calcTotal() {
+    if (!sex || !height || !weight || !age || !ratio) {
+      result.textContent = '____';
+      return;
+    }
+
+    if (sex === 'female') {
+      result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+    } else {
+      result.textContent =Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+    }
+  }
+
+  calcTotal();
+
+  function getStaticInformation(parentSelector, activeClass) {
+    const elements = document.querySelectorAll(`${parentSelector} div`);
+    elements.forEach(elem => {
+      elem.addEventListener('click', (e) => {
+        if (e.target.getAttribute('data-ratio')) {
+          ratio = +e.target.getAttribute('data-ratio');
+          } else {
+          sex = e.target.getAttribute('id');
+      }
+  
+      elements.forEach(elem => {
+          elem.classList.remove(activeClass);
+      });
+  
+      e.target.classList.add(activeClass);
+  
+      calcTotal();
+      });
+    });
+  }
+
+
+  getStaticInformation('#gender', 'calculating__choose-item_active');
+  getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+
+  function getDinamicInformation(selector) {
+    const input = document.querySelector(selector);
+
+    input.addEventListener('input', () => {
+        switch(input.getAttribute('id')) {
+          case 'height':
+                height = +input.value;
+                break;
+          case 'weight':
+                weight = +input.value;    
+                break;  
+          case 'age':
+                  age = +input.value;    
+                  break; 
+        }
+        calcTotal();
+    });
+  }
+
+  getDinamicInformation('#height');
+  getDinamicInformation('#weight');
+  getDinamicInformation('#age');
 });
