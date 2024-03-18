@@ -1,3 +1,5 @@
+ import { getResoursce } from "../services/services";
+
  function cards() {
     class MenuCard {
         constructor(src, alt, title, descr, price, parentSelector, ...classes) {
@@ -41,32 +43,23 @@
         }
     }
 
-    const getResoursce = async (url) => {
-      const res = await fetch(url);
-
-      if (!res.ok) {
-        throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-      }
-
-      return await res.json();
-    };
 
     //1way
-    // getResoursce('http://localhost:3000/menu')
-    // .then(data => {
-    //   data.forEach(({img, altimg, title, descr, price}) => {
-    //        new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-    //   });
-    // });
+    getResoursce('http://localhost:3000/menu')
+    .then(data => {
+      data.forEach(({img, altimg, title, descr, price}) => {
+           new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+      });
+    });
 
 
 //axios
-axios.get('http://localhost:3000/menu')
-.then(data => {
-      data.data.forEach(({img, altimg, title, descr, price}) => {
-           new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-      });
-});
+// axios.get('http://localhost:3000/menu')
+// .then(data => {
+//       data.data.forEach(({img, altimg, title, descr, price}) => {
+//            new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+//       });
+// });
 
 
 // 2 way
@@ -98,4 +91,4 @@ axios.get('http://localhost:3000/menu')
     //   }
  }
 
- module.exports = cards;
+ export default cards;
